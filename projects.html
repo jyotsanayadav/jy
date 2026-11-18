@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar"></div>
+<nav>
+  <a class="logo sn" href="index.html">Jyotsana</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a class="on" href="projects.html">Projects</a></li>
+    <li><a href="articles.html">Articles</a></li>
+  </ul>
+</nav>
+
+<header class="pagehead">
+  <div>
+<div class="ph">    <h1>Projects</h1>
+    <p>Things I’ve built, and the one I’m still building. Open a card to see what it does.</p></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="chips" id="chips"></div>
+  <div class="pgrid" id="pGrid"></div>
+</main>
+
+<footer>© <span id="yr"></span> <span class="sn">Jyotsana</span>. Made with warm light and too much tea.</footer>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+document.title = "Projects – " + SITE.name;
+const grid = $("pGrid"), chips = $("chips");
+let cur = "All";
+
+const net = () => {
+  const L = [3, 4, 2], X = [45, 115, 185], pt = (l, k) => [X[l], 60 + (k - (L[l] - 1) / 2) * 32];
+  let g = "";
+  for (let l = 0; l < 2; l++) for (let a = 0; a < L[l]; a++) for (let b = 0; b < L[l + 1]; b++) {
+    const p = pt(l, a), q = pt(l + 1, b); g += `<line x1="${p[0]}" y1="${p[1]}" x2="${q[0]}" y2="${q[1]}"/>`;
+  }
+  L.forEach((n, l) => { for (let k = 0; k < n; k++) { const p = pt(l, k); g += `<circle cx="${p[0]}" cy="${p[1]}" r="7"/>`; } });
+  return `<svg viewBox="0 0 230 120" width="210" aria-hidden="true">${g}</svg>`;
+};
+const wave = () => `<div class="wave" aria-hidden="true">${Array.from({ length: 22 }, (_, i) =>
+  `<i style="height:${20 + Math.abs(Math.sin(i * 1.3)) * 70}%;animation-delay:${i * 70}ms"></i>`).join("")}</div>`;
+const art = t => t === "Full-stack" ? `<div class="code" aria-hidden="true">&lt;/&gt;</div>` : t === "Deep Learning" ? net() : wave();
+
+const types = ["All", ...new Set(SITE.projects.map(p => p.type).filter(Boolean))];
+chips.innerHTML = types.map(t => `<button class="chip${t === "All" ? " on" : ""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
+chips.onclick = e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  cur = b.dataset.t; [...chips.children].forEach(c => c.classList.toggle("on", c === b)); draw();
+};
+
+function draw() {
+  grid.innerHTML = SITE.projects.filter(p => cur === "All" || p.type === cur).map(p => `
+    <article class="pcard">
+      <div class="screen s-${esc((p.type || "").replace(/\W/g, ""))}">
+        <div class="dots"><i></i><i></i><i></i></div>
+        ${p.status ? `<span class="status">${esc(p.status)}</span>` : ""}
+        ${art(p.type)}
+      </div>
+      <div class="pbody">
+        <p class="ptype">${esc(p.type || "Project")}</p>
+        <h3>${esc(p.title)}</h3>
+        <p>${esc(p.desc)}</p>
+        <div class="tags">${p.tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>
+        ${p.features ? `<button class="tog" aria-expanded="false">What it does</button>
+          <div class="fw"><ul>${p.features.map(f => `<li>${esc(f)}</li>`).join("")}</ul></div>` : ""}
+        ${p.links.length ? `<div class="plinks">${p.links.map(l => `<a class="pbtn" href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join("")}</div>` : ""}
+      </div>
+    </article>`).join("");
+  reveal(grid);
+}
+grid.addEventListener("click", e => {
+  const b = e.target.closest(".tog"); if (!b) return;
+  const open = b.nextElementSibling.classList.toggle("open");
+  b.setAttribute("aria-expanded", open); b.textContent = open ? "Hide details" : "What it does";
+});
+draw();
+</script>
+</body>
+</html>

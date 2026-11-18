@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Articles</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="bar"></div>
+<nav>
+  <a class="logo sn" href="index.html">Jyotsana</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a class="on" href="articles.html">Articles</a></li>
+  </ul>
+</nav>
+
+<header class="pagehead">
+  <div>
+<div class="ph">    <h1>Articles</h1>
+    <p>Things I’ve written between lectures, matches and late nights. Pick one and settle in.</p></div>
+  </div>
+</header>
+
+<main class="wrap" id="listView">
+  <div class="chips" id="chips"></div>
+  <div class="agrid" id="aGrid"></div>
+</main>
+<main id="readView"></main>
+
+<footer>© <span id="yr"></span> <span class="sn">Jyotsana</span>. Made with warm light and too much tea.</footer>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+document.title = "Articles – " + SITE.name;
+const grid = $("aGrid"), chips = $("chips"), view = $("readView");
+let cur = "All";
+const tags = ["All", ...new Set(SITE.articles.map(a => a.tag).filter(Boolean))];
+chips.innerHTML = tags.map(t => `<button class="chip${t === "All" ? " on" : ""}" data-t="${esc(t)}">${esc(t)}</button>`).join("");
+chips.onclick = e => {
+  const b = e.target.closest(".chip"); if (!b) return;
+  cur = b.dataset.t; [...chips.children].forEach(c => c.classList.toggle("on", c === b)); drawList();
+};
+
+function drawList() {
+  const items = SITE.articles.map((a, i) => ({ a, i })).filter(x => cur === "All" || x.a.tag === cur);
+  grid.innerHTML = items.map(({ a, i }, k) =>
+    `<a class="acard" href="#a${i}">
+       ${a.thumb ? `<div class="thumb"><img src="${esc(a.thumb)}" alt="${esc(a.title)}" loading="lazy"><span class="tagchip">${esc(a.tag || "")}</span></div>` : `<div class="cover t-${esc(a.tag || "")}"><span>${esc(a.tag || "")}</span></div>`}
+       <div class="abody"><p class="ameta">${esc(a.date)} · ${esc(a.read)}</p><h3>${esc(a.title)}</h3>
+       <p>${esc(a.excerpt)}</p><span class="go">Read article</span></div></a>`).join("");
+  reveal(grid);
+}
+
+function route() {
+  const m = location.hash.match(/^#a(\d+)$/), a = m && SITE.articles[+m[1]];
+  document.body.classList.toggle("reading-mode", !!a);
+  if (!a) return;
+  const n = SITE.articles.length, nx = (+m[1] + 1) % n;
+  view.innerHTML = `<article class="reading"><a class="back" href="#">All articles</a>
+    ${a.thumb ? `<img class="rthumb" src="${esc(a.thumb)}" alt="">` : ""}
+    ${a.tag ? `<span class="rtag">${esc(a.tag)}</span>` : ""}<h1>${esc(a.title)}</h1>
+    <p class="rmeta">${esc(a.date)} · ${esc(a.read)}</p>
+    <div class="rbody">${a.body.map(p => p.startsWith("## ") ? `<h3>${esc(p.slice(3))}</h3>` : `<p>${esc(p)}</p>`).join("")}</div>
+    ${n > 1 ? `<a class="next" href="#a${nx}"><small>Next article</small><b>${esc(SITE.articles[nx].title)}</b></a>` : ""}</article>`;
+  document.title = a.title + " – " + SITE.name;
+  scrollTo(0, 0);
+}
+addEventListener("hashchange", route);
+drawList(); route();
+</script>
+</body>
+</html>

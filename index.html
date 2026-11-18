@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jyotsana – Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="bar"></div>
+<nav>
+  <a class="logo" href="#top" id="logoName">Jyotsana</a>
+  <ul>
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="projects.html">Projects</a></li>
+    <li><a href="articles.html">Articles</a></li>
+  </ul>
+</nav>
+
+<header class="hero" id="top">
+  <div class="light"></div>
+  <div class="glow" id="glow"></div>
+  <div class="hero-copy">
+    <h1 id="heroName">Jyotsana</h1>
+    <p class="roleline">I’m a <span class="role" id="role">MERN stack developer</span></p>
+    <p id="heroTag">B.Tech CSE student specializing in AI/ML. I build with the MERN stack, solve DSA problems in Java, and write about what I learn.</p>
+    <div class="btns">
+      <a class="btn solid" href="projects.html">See my projects</a>
+      <a class="btn ghost" href="articles.html">Read my articles</a>
+    </div>
+  </div>
+</header>
+
+<main>
+<section class="block" id="about">
+  <h2>About me</h2>
+  <div class="about">
+    <div>
+      <!-- EDIT: write your own story here -->
+      <p>Hi, I’m Jyotsana. I’m a third-year B.Tech CSE student specializing in AI/ML at [your college], based in Dehradun. I build web apps with the MERN stack, I practice DSA in Java, and I’m growing more curious about Deep Learning every month.</p>
+      <p>I’m a devotee of Maa Durga, and I love superhero movies and thrillers with an unexpected ending. I enjoy live sports, reading with something warm in hand, and the occasional game of chess, Rubik’s Cube or calligraphy session. This site is where my projects and articles live.</p>
+    </div>
+    <aside class="facts">
+      <h3>At a glance</h3>
+      <dl>
+        <dt>Studying</dt><dd>B.Tech, 3rd year</dd>
+        <dt>Focus</dt><dd>AI/ML and MERN stack</dd>
+        <dt>Based in</dt><dd>Dehradun, India</dd>
+        <dt>Open to</dt><dd>Internships</dd>
+      </dl>
+    </aside>
+  </div>
+</section>
+
+<section class="block" id="skills">
+  <h2>Skills and interests</h2>
+  <p class="lead">The tools I use, and the things that keep me curious away from the screen.</p>
+  <div class="skills" id="skillsGrid"></div>
+</section>
+
+<section class="block" id="projects">
+  <h2>Projects</h2>
+  <p class="lead">A few things I’ve built. Each one taught me something I didn’t expect.</p>
+  <div id="projectList"></div>
+  <a class="more" href="projects.html">See all projects</a>
+</section>
+
+<section class="block" id="articles">
+  <h2>Articles</h2>
+  <p class="lead">Things I’ve written between lectures, matches and late nights.</p>
+  <div id="articleList"></div>
+  <a class="more" href="articles.html">Read all articles</a>
+</section>
+
+</main>
+
+<footer>© <span id="yr"></span> <span id="footName">Jyotsana</span>. Made with warm light and too much tea.</footer>
+
+
+<script src="data.js"></script>
+<script>
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+["logoName","heroName","footName"].forEach(i => $(i).textContent = SITE.name);
+document.title = SITE.name + " – Portfolio";
+$("yr").textContent = new Date().getFullYear();
+
+$("skillsGrid").innerHTML = SITE.skills.map(c =>
+  `<div class="col"><h3>${esc(c.title)}</h3><ul>${c.items.map(i => `<li>${esc(i[0])}<span>${esc(i[1])}</span></li>`).join("")}</ul></div>`).join("");
+
+$("projectList").innerHTML = SITE.projects.slice(0,2).map(p =>
+  `<article class="project"><h3>${esc(p.title)}${p.status?` <small class="status">${esc(p.status)}</small>`:""}</h3><p>${esc(p.desc)}</p>
+   <div class="tags">${p.tags.map(t => `<span>${esc(t)}</span>`).join("")}</div>
+   <div class="links">${p.links.map(l => `<a href="${esc(l[1])}" target="_blank" rel="noopener">${esc(l[0])}</a>`).join("")}</div></article>`).join("");
+
+$("articleList").innerHTML = SITE.articles.slice(0,2).map((a, i) =>
+  `<a class="article" href="articles.html#a${i}"><h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p><time>${esc(a.date)}<br>${esc(a.read)}</time></a>`).join("");
+
+
+
+/* ===== interactions ===== */
+const bar=$("bar"),hero=document.querySelector(".hero"),glow=$("glow");
+function onScroll(){
+  const h=document.documentElement,max=h.scrollHeight-innerHeight;
+  bar.style.width=(max>0?scrollY/max*100:0)+"%";
+  hero.style.setProperty("--py",Math.min(scrollY*.12,120)+"px");
+}
+addEventListener("scroll",onScroll,{passive:true});onScroll();
+
+hero.addEventListener("mousemove",e=>{const r=hero.getBoundingClientRect();glow.style.left=e.clientX-r.left+"px";glow.style.top=e.clientY-r.top+"px";glow.style.opacity=1});
+hero.addEventListener("mouseleave",()=>glow.style.opacity=0);
+
+const links=[...document.querySelectorAll("nav ul a")];
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(a=>a.classList.toggle("on",a.getAttribute("href")==="#"+e.target.id))}),{rootMargin:"-45% 0px -50% 0px"});
+document.querySelectorAll("main section").forEach(x=>spy.observe(x));
+
+const rv=new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting)return; const t=e.target; t.classList.add("in"); rv.unobserve(t);
+  setTimeout(()=>{t.classList.remove("rv","in");t.style.transitionDelay=""},1100);
+}),{threshold:.1});
+document.querySelectorAll("main h2,main .lead,.about>*,.col,.project,.article").forEach(el=>{
+  el.classList.add("rv");el.style.transitionDelay=([...el.parentNode.children].indexOf(el)%4)*90+"ms";rv.observe(el);
+});
+
+const roles=["MERN stack developer","AI/ML learner","writer and reader"];let ri=0;const role=$("role");
+setInterval(()=>{role.style.opacity=0;role.style.transform="translateY(8px)";
+  setTimeout(()=>{ri=(ri+1)%roles.length;role.textContent=roles[ri];role.style.opacity=1;role.style.transform="none"},400)},2600);
+
+
+
+</script>
+</body>
+</html>
