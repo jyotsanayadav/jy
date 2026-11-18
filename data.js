@@ -31,20 +31,16 @@ const SITE = {
       "title": "Off the keyboard",
       "items": [
         [
-          "Superhero and thriller movies",
-          "The ones with an unexpected ending"
-        ],
-        [
-          "Live sports",
-          "Argentina’s 3–2 comeback against Egypt had me shouting at my screen"
+          "On the screen",
+          "Superhero movies, live sports or any good reality show"
         ],
         [
           "Reading",
-          "Always with something warm to drink"
+          "Mostly rom-coms and contemporary fiction"
         ],
         [
-          "Chess, Rubik’s Cube and calligraphy",
-          "Slow, focused hobbies"
+          "Some slow, focused hobbies",
+          "Chess, Cube, calligraphy"
         ],
         [
           "Recreational sports",
